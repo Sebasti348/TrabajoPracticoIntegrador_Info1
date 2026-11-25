@@ -241,7 +241,7 @@ int main(int argc, char *argv[]) {
                     printf("[%ld] %s: %s\n", resp_bot.date, resp_bot.name, resp_bot.mensaje);
                 }
                 else{
-                  if (strcasecmp(mensaje.mensaje, "dooms") == 0) {
+                  if (strcasecmp(mensaje.mensaje, "doomsday") == 0) {
                     char respuesta[256];
                     mensajeTelegram resp_bot = {0};
                     doomsday(mensaje.date, respuesta, sizeof(respuesta));
