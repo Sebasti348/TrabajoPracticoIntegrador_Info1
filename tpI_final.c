@@ -67,9 +67,8 @@ int rescatarDatos(struct memory chunk, mensajeTelegram *mimsj) {
     }
 
     mimsj->update_id = buscar_dato(pos_update, "\"update_id\":");
-    mimsj->date      = buscar_dato(pos_update, "\"date\":");
+    mimsj->date = buscar_dato(pos_update, "\"date\":");
 
-    // Buscamos chat_id y first_name dentro de la subestructura "chat"
     char *pos_chat = strstr(pos_update, "\"chat\":{");
     if (pos_chat != NULL) {
         mimsj->chat_id = buscar_dato(pos_chat, "\"id\":");
@@ -193,13 +192,9 @@ int main(int argc, char *argv[]) {
     while (1) {
       
         if (ultimo_update_id > 0) {
-            snprintf(api_url, sizeof(api_url),
-                     "https://api.telegram.org/bot%s/getUpdates?offset=%ld",
-                     token, ultimo_update_id + 1);
+            snprintf(api_url, sizeof(api_url),"https://api.telegram.org/bot%s/getUpdates?offset=%ld",token, ultimo_update_id + 1);
         } else {
-            snprintf(api_url, sizeof(api_url),
-                     "https://api.telegram.org/bot%s/getUpdates",
-                     token);
+            snprintf(api_url, sizeof(api_url),"https://api.telegram.org/bot%s/getUpdates",token);
         }
 
         struct memory chunk = {0};
@@ -218,7 +213,6 @@ int main(int argc, char *argv[]) {
             if (rescatarDatos(chunk, &mensaje) == 1) {
                 printf("[%ld] %s: %s\n", mensaje.date, mensaje.name, mensaje.mensaje);
                 guardar_en_txt(&mensaje);
-
               
                 if (strcasecmp(mensaje.mensaje, "hola") == 0) {
                     char respuesta[256];
@@ -261,23 +255,16 @@ int main(int argc, char *argv[]) {
                       if (res == CURLE_OK && respuesta_api.response != NULL) {
                         char url_foto[512];
                         buscar_texto(respuesta_api.response, "\"message\":\"", url_foto, sizeof(url_foto));
-
-                        int j = 0;
-                        for (int i = 0; url_foto[i] != '\0'; i++) {
-                            if (url_foto[i] != '\\') {
-                                url_foto[j++] = url_foto[i];
-                            }
-                        }
-                        url_foto[j] = '\0';
-
                         mensajeTelegram resp_bot = {0};
                         enviar_mensaje(curl, token, mensaje.chat_id, url_foto, &resp_bot);
                         guardar_en_txt(&resp_bot);
                         printf("[%ld] %s: %s\n", resp_bot.date, resp_bot.name, resp_bot.mensaje);
+                        free(respuesta_api.response);
                     } else {
                         printf("Error al consultar la API (%s): %d\n", url, res);
                     }
                     }
+                    
                   }
                 }
               }
