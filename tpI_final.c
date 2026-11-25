@@ -98,9 +98,7 @@ void enviar_mensaje(CURL *curl, const char *token, long chat_id, const char *tex
     char *texto_codificado = curl_easy_escape(curl, texto_plano, 0);
     if (texto_codificado == NULL) return;
 
-    snprintf(url_envio, sizeof(url_envio),
-             "https://api.telegram.org/bot%s/sendMessage?chat_id=%ld&text=%s",
-             token, chat_id, texto_codificado);
+    snprintf(url_envio, sizeof(url_envio),"https://api.telegram.org/bot%s/sendMessage?chat_id=%ld&text=%s",token, chat_id, texto_codificado);
 
     curl_free(texto_codificado);
 
@@ -135,13 +133,11 @@ int leer_token(const char *ruta_archivo, char *token, int max_tam) {
         perror("No se pudo abrir el archivo del token");
         return 0;
     }
-
     if (fgets(token, max_tam, f) == NULL) {
         fclose(f);
         return 0;
     }
     fclose(f);
-
     token[strcspn(token, "\r\n")] = '\0';
     return 1;
 }
@@ -163,9 +159,6 @@ void doomsday(long fecha_actual, char *destino, int max_tam) {
         snprintf(destino, max_tam, "Avengers: Doomsday ya se estreno!");
     }
 }
-
-
-
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -228,7 +221,6 @@ int main(int argc, char *argv[]) {
                   if (strcasecmp(mensaje.mensaje, "chau") == 0) {
                     char respuesta[256];
                     mensajeTelegram resp_bot = {0};
-
                     snprintf(respuesta, sizeof(respuesta), "Chau %s, que tengas lindo dia", mensaje.name);
                     enviar_mensaje(curl, token, mensaje.chat_id, respuesta, &resp_bot);
                     guardar_en_txt(&resp_bot);
@@ -250,7 +242,6 @@ int main(int argc, char *argv[]) {
                       curl_easy_setopt(curl, CURLOPT_URL, url);
                       curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
                       curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&respuesta_api);
-
                       CURLcode res = curl_easy_perform(curl);
                       if (res == CURLE_OK && respuesta_api.response != NULL) {
                         char url_foto[512];
