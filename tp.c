@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <curl/curl.h>
 
+//https://github.com/Sebasti348/TrabajoPracticoIntegrador_Info1.git
+
 struct memory {
     char *response;
     size_t size;
