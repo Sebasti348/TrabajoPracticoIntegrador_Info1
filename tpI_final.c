@@ -63,7 +63,7 @@ int rescatarDatos(struct memory chunk, mensajeTelegram *mimsj) {
 
     char *pos_update = strstr(chunk.response, "\"update_id\":");
     if (pos_update == NULL) {
-        return 0; // No hay mensajes nuevos ("result":[])
+        return 0; 
     }
 
     mimsj->update_id = buscar_dato(pos_update, "\"update_id\":");
@@ -143,20 +143,19 @@ int leer_token(const char *ruta_archivo, char *token, int max_tam) {
     }
     fclose(f);
 
-    // Eliminamos el salto de línea (\n o \r\n) al final del archivo si existe
     token[strcspn(token, "\r\n")] = '\0';
     return 1;
 }
 
 void doomsday(long fecha_actual, char *destino, int max_tam) {
-    // Timestamp Unix del 18 de diciembre de 2026 a las 00:00 hs (hora de Argentina)
+    
     long estreno = 1797562800; 
     long restante = estreno - fecha_actual;
 
     if (restante > 0) {
-        long dias     = restante / 86400;          // 1 día = 86400 segundos
-        long minutos  = (restante % 86400) / 60;   // Minutos sobrantes del día
-        long segundos = restante % 60;             // Segundos sobrantes del minuto
+        long dias     = restante / 86400;          
+        long minutos  = (restante % 86400) / 60;   
+        long segundos = restante % 60;             
 
         snprintf(destino, max_tam,
                  "Faltan %ld dias, %ld minutos y %ld segundos para Avengers: Doomsday",
@@ -165,6 +164,7 @@ void doomsday(long fecha_actual, char *destino, int max_tam) {
         snprintf(destino, max_tam, "Avengers: Doomsday ya se estreno!");
     }
 }
+
 
 
 
