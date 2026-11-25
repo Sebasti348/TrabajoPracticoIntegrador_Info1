@@ -5,13 +5,11 @@
 #include <unistd.h>
 #include <curl/curl.h>
 
-// Estructura de libcurl para recibir la respuesta en memoria dinámica
 struct memory {
     char *response;
     size_t size;
 };
 
-// Estructura propia para almacenar los datos del mensaje
 typedef struct {
     long update_id;
     long chat_id;
@@ -20,7 +18,6 @@ typedef struct {
     char mensaje[512];
 } mensajeTelegram;
 
-// Callback oficial de libcurl para ir pegando los paquetes descargados
 static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
     size_t realsize = size * nmemb;
     struct memory *mem = (struct memory *)clientp;
@@ -36,7 +33,6 @@ static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
     return realsize;
 }
 
-// Busca un valor numérico (long) a partir de una etiqueta
 long buscar_dato(const char *donde_buscar, const char *clave) {
     if (donde_buscar == NULL) return 0;
 
@@ -48,7 +44,6 @@ long buscar_dato(const char *donde_buscar, const char *clave) {
     return dato;
 }
 
-// Busca una cadena de texto entre comillas a partir de una etiqueta
 void buscar_texto(const char *donde_buscar, const char *clave, char *destino, int max_tam) {
     destino[0] = '\0';
     if (donde_buscar == NULL) return;
@@ -61,7 +56,6 @@ void buscar_texto(const char *donde_buscar, const char *clave, char *destino, in
     }
 }
 
-// Extrae los campos de un mensaje recibido desde /getUpdates
 int rescatarDatos(struct memory chunk, mensajeTelegram *mimsj) {
     if (chunk.response == NULL) return 0;
 
@@ -85,7 +79,6 @@ int rescatarDatos(struct memory chunk, mensajeTelegram *mimsj) {
     return 1;
 }
 
-// Guarda un mensaje (recibido o enviado) en el archivo de texto
 void guardar_en_txt(const mensajeTelegram *mimsj) {
     FILE *archivo = fopen("historial_chat.txt", "a");
     if (archivo == NULL) {
@@ -97,7 +90,6 @@ void guardar_en_txt(const mensajeTelegram *mimsj) {
     fclose(archivo);
 }
 
-// Envía una respuesta al chat usando /sendMessage y guarda los datos de lo enviado en resp_bot
 void enviar_mensaje(CURL *curl, const char *token, long chat_id, const char *texto_plano, mensajeTelegram *resp_bot) {
     char url_envio[512];
     struct memory chunk_envio = {0};
@@ -120,7 +112,6 @@ void enviar_mensaje(CURL *curl, const char *token, long chat_id, const char *tex
         printf("Error al enviar respuesta: %d\n", res);
     }
 
-    // Extraemos de la respuesta de Telegram la fecha exacta y el nombre del bot
     if (chunk_envio.response != NULL) {
         resp_bot->chat_id = chat_id;
         resp_bot->date = buscar_dato(chunk_envio.response, "\"date\":");
@@ -137,7 +128,6 @@ void enviar_mensaje(CURL *curl, const char *token, long chat_id, const char *tex
     }
 }
 
-// Lee el token desde el archivo pasado por línea de comandos
 int leer_token(const char *ruta_archivo, char *token, int max_tam) {
     FILE *f = fopen(ruta_archivo, "r");
     if (f == NULL) {
@@ -199,7 +189,7 @@ int main(int argc, char *argv[]) {
     printf("Bot iniciado. Esperando mensajes (Ctrl + C para salir)...\n");
 
     while (1) {
-        // 1. Armamos la URL de consulta con offset si ya hubo mensajes previos
+      
         if (ultimo_update_id > 0) {
             snprintf(api_url, sizeof(api_url),
                      "https://api.telegram.org/bot%s/getUpdates?offset=%ld",
@@ -227,7 +217,7 @@ int main(int argc, char *argv[]) {
                 printf("[%ld] %s: %s\n", mensaje.date, mensaje.name, mensaje.mensaje);
                 guardar_en_txt(&mensaje);
 
-                // Evaluamos si es "hola" o "chau" (sin importar mayúsculas/minúsculas)
+              
                 if (strcasecmp(mensaje.mensaje, "hola") == 0) {
                     char respuesta[256];
                     mensajeTelegram resp_bot = {0};
@@ -289,14 +279,13 @@ int main(int argc, char *argv[]) {
                   }
                 }
               }
-
-                // Actualizamos el offset para marcar el mensaje como leído
+              
                 ultimo_update_id = mensaje.update_id;
             }
             free(chunk.response);
         }
 
-        sleep(2); // Espera 2 segundos entre consultas
+        sleep(2); 
     }
 
     curl_easy_cleanup(curl);
